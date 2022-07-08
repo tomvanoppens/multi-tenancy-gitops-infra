@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sysctl-conf
+  annotations:
+    argocd.argoproj.io/sync-wave: "105"
+spec:
+  selector:
+    matchLabels:
+      name:  sysctl-conf
+  template:
+    metadata:
+      labels:
+        name: sysctl-conf
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - sysctl -w vm.max_map_count=262144 && while true; do sleep 86400; done
+        image: busybox:1.26.2
+        name: sysctl-conf
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        securityContext:
+          privileged: true
+      terminationGracePeriodSeconds: 1
